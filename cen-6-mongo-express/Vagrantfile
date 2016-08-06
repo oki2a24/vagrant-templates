@@ -1,0 +1,15 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# ipアドレスをシェルスクリプトに渡したいので、変数を定義する。
+ipadress = "192.168.56.11"
+
+Vagrant.configure(2) do |config|
+  config.vm.box = "oki2a24/centos-6-x86_64"
+  config.vm.network "private_network", ip: ipadress
+  config.vm.provision "shell", path: "../scripts/cen-6-init.sh"
+  config.vm.provision "shell" do |shell|
+    shell.path = "../scripts/cen-6-mongo-express.sh"
+    shell.args = ipadress
+  end
+end
