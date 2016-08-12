@@ -12,8 +12,7 @@
 #
 ###########################################################################
 
-set -e
-set -x
+set -eux
 
 echo "MongoDB インストールと設定"
 # Install MongoDB Community Edition on Red Hat Enterprise or CentOS Linux — MongoDB Manual 3.2 https://docs.mongodb.com/manual/tutorial/install-mongodb-on-red-hat/
