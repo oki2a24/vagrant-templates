@@ -1,6 +1,8 @@
 # vagrant-templates
 ## 使い方例
 ```bash
+git clone https://github.com/oki2a24/vagrant-templates.git
+cd vagrant-templates
 cd cen-6-mongo-express
 vagrant up
 ```
