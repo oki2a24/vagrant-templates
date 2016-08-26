@@ -43,5 +43,5 @@ chkconfig ntpd on
 /etc/init.d/ntpd start
 
 echo "SELINUX を無効化"
-sed -i -e 's/SELINUX=enforcing/SELINUX=disabled/' /etc/sysconfig/selinux
+sed -i -e 's/SELINUX=enforcing/SELINUX=disabled/' /etc/selinux/config
 setenforce permissive
