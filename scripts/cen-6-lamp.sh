@@ -109,6 +109,33 @@ Y
 Y
 Y
 EOF
+# 全クエリログ出力
+cp -a /etc/my.cnf /etc/my.cnf.org
+sed -i -e 's|\[mysqld\]|\[mysqld\]\ngeneral_log=1\ngeneral_log_file=/var/log/mysql/query.log|' /etc/my.cnf
+mkdir -p /var/log/mysql/
+touch /var/log/mysql/query.log
+chown -R mysql:mysql /var/log/mysql/
+# ログローテート
+cat > /etc/logrotate.d/mysql <<EOF
+/var/log/mysql/*.log {
+    create 640 mysql mysql
+    notifempty
+    daily
+    rotate 3
+    missingok
+    compress
+    postrotate
+    # just if mysqld is really running
+    if test -x /usr/bin/mysqladmin && \
+        /usr/bin/mysqladmin ping &>/dev/null
+    then
+        /usr/bin/mysqladmin flush-logs
+    fi
+    endscript
+}
+EOF
+# 設定完了、再起動
+service mysqld restart
 
 echo "phpMyAdmin インストールと設定"
 yum -y --enablerepo=epel install phpMyAdmin
