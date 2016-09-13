@@ -1,6 +1,8 @@
 # vagrant-templates
 ## 使い方例
 ```bash
+git clone https://github.com/oki2a24/vagrant-templates.git
+cd vagrant-templates
 cd cen-6-mongo-express
 vagrant up
 ```
@@ -12,7 +14,7 @@ vagrant up
 - Node.js 6.x
 - [Mongo Express](https://github.com/mongo-express/mongo-express)
 
-### cen-6-lanp
+### cen-6-lamp
 - CentOS 6 x86_64
 - Apache 2.2
 - MySQL 5.1
