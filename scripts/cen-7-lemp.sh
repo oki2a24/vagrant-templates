@@ -13,7 +13,7 @@
 
 set -eux
 
-# PHP7
+echo "PHP7 インストール"
 # EPEL、Remi リポジトリ追加
 yum -y install epel-release
 rpm -ivh http://rpms.famillecollet.com/enterprise/remi-release-7.rpm
@@ -22,8 +22,39 @@ yum --enablerepo=remi -y update remi-release
 sudo sed -i -e 's/^enabled=1/enabled=0/' /etc/yum.repos.d/epel.repo
 # php7 と図形、日本語、キャッシュをインストール
 yum --enablerepo=epel,remi,remi-php70 -y install php php-gd php-mbstring php-mysqlnd php-opcache
+# TODO PHP 設定
 
-# Nginx
+echo "PHP-FPM インストールと設定"
+# インストール
+yum --enablerepo=remi,remi-php70 -y install php-fpm
+# 設定ファイル編集
+cp -a /etc/php-fpm.d/www.conf /etc/php-fpm.d/www.conf.org
+cat > /etc/php-fpm.d/www.conf <<EOF
+[www]
+user = nginx
+group = nginx
+listen = /var/run/php-fpm/php-fpm.sock
+listen.allowed_clients = 127.0.0.1
+listen.owner = nginx
+listen.group = nginx
+listen.mode = 0660
+pm = dynamic
+pm.max_children = 50
+pm.start_servers = 5
+pm.min_spare_servers = 5
+pm.max_spare_servers = 35
+slowlog = /var/log/php-fpm/www-slow.log
+php_admin_value[error_log] = /var/log/php-fpm/www-error.log
+php_admin_flag[log_errors] = on
+php_value[session.save_handler] = files
+php_value[session.save_path]    = /var/lib/php/session
+php_value[soap.wsdl_cache_dir]  = /var/lib/php/wsdlcache
+EOF
+# 起動と自動起動設定
+systemctl start php-fpm.service
+systemctl enable php-fpm.service
+
+echo "Nginx インストールと設定"
 # リポジトリ追加
 cat > /etc/yum.repos.d/nginx.repo <<'EOF'
 [nginx]
@@ -61,37 +92,7 @@ EOF
 systemctl start nginx
 systemctl enable nginx
 
-# PHP-FPM
-# インストール
-yum --enablerepo=remi,remi-php70 -y install php-fpm
-# 設定ファイル編集
-cp -a /etc/php-fpm.d/www.conf /etc/php-fpm.d/www.conf.org
-cat > /etc/php-fpm.d/www.conf <<EOF
-[www]
-user = nginx
-group = nginx
-listen = /var/run/php-fpm/php-fpm.sock
-listen.allowed_clients = 127.0.0.1
-listen.owner = nginx
-listen.group = nginx
-listen.mode = 0660
-pm = dynamic
-pm.max_children = 50
-pm.start_servers = 5
-pm.min_spare_servers = 5
-pm.max_spare_servers = 35
-slowlog = /var/log/php-fpm/www-slow.log
-php_admin_value[error_log] = /var/log/php-fpm/www-error.log
-php_admin_flag[log_errors] = on
-php_value[session.save_handler] = files
-php_value[session.save_path]    = /var/lib/php/session
-php_value[soap.wsdl_cache_dir]  = /var/lib/php/wsdlcache
-EOF
-# 起動と自動起動設定
-systemctl start php-fpm.service
-systemctl enable php-fpm.service
-
-# MariaDB
+echo "MariaDB インストールと設定"
 # リポジトリ追加
 cat > /etc/yum.repos.d/MariaDB.repo <<EOF
 # MariaDB 10.1 CentOS repository list - created 2016-02-21 01:37 UTC
@@ -134,6 +135,7 @@ Y
 Y
 Y
 EOF
+# TODO 全ログ出力設定
 
 # phpMyAdmin
 yum --enablerepo=epel,remi,remi-php70 -y install phpMyAdmin
