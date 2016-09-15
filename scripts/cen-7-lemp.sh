@@ -13,6 +13,47 @@
 
 set -eux
 
+echo "Nginx インストールと設定"
+# リポジトリ追加
+cat > /etc/yum.repos.d/nginx.repo <<'EOF'
+[nginx]
+name=nginx repo
+baseurl=http://nginx.org/packages/centos/7/$basearch/
+gpgcheck=0
+enabled=0
+EOF
+# Nginx インストール
+yum --enablerepo=nginx -y install nginx
+# バックアップ
+cp -a /etc/nginx/conf.d/default.conf /etc/nginx/conf.d/default.conf.org
+# 設定ファイル編集
+cat > /etc/nginx/conf.d/default.conf <<'EOF'
+server {
+    # ポート
+    listen       80;
+    # サーバ名
+    server_name  localhost;
+    # ドキュメントルート設定
+    root /var/www/html;
+    # /で終わるURI時に返すファイルを指定
+    index index.php index.html index.htm;
+
+    # PHP-FPM 設定
+    location ~ \.php$ {
+        fastcgi_pass   unix:/var/run/php-fpm/php-fpm.sock;
+        fastcgi_index  index.php;
+        fastcgi_param  SCRIPT_FILENAME  $document_root$fastcgi_script_name;
+        include        fastcgi_params;
+    }
+}
+EOF
+# 起動と自動起動設定
+systemctl start nginx.service
+systemctl enable nginx.service
+# ファイアーウォール設定
+firewall-cmd --permanent --zone=public --add-service=http
+firewall-cmd --reload
+
 echo "PHP7 インストール"
 # EPEL、Remi リポジトリ追加
 yum -y install epel-release
@@ -53,44 +94,6 @@ EOF
 # 起動と自動起動設定
 systemctl start php-fpm.service
 systemctl enable php-fpm.service
-
-echo "Nginx インストールと設定"
-# リポジトリ追加
-cat > /etc/yum.repos.d/nginx.repo <<'EOF'
-[nginx]
-name=nginx repo
-baseurl=http://nginx.org/packages/centos/7/$basearch/
-gpgcheck=0
-enabled=0
-EOF
-# Nginx インストール
-yum --enablerepo=nginx -y install nginx
-# バックアップ
-cp -a /etc/nginx/conf.d/default.conf /etc/nginx/conf.d/default.conf.org
-# 設定ファイル編集
-cat > /etc/nginx/conf.d/default.conf <<'EOF'
-server {
-    # ポート
-    listen       80;
-    # サーバ名
-    server_name  localhost;
-    # ドキュメントルート設定
-    root /var/www/html;
-    # /で終わるURI時に返すファイルを指定
-    index index.php index.html index.htm;
-
-    # PHP-FPM 設定
-    location ~ \.php$ {
-        fastcgi_pass   unix:/var/run/php-fpm/php-fpm.sock;
-        fastcgi_index  index.php;
-        fastcgi_param  SCRIPT_FILENAME  $document_root$fastcgi_script_name;
-        include        fastcgi_params;
-    }
-}
-EOF
-# 起動と自動起動設定
-systemctl start nginx
-systemctl enable nginx
 
 echo "MariaDB インストールと設定"
 # リポジトリ追加
@@ -137,7 +140,7 @@ Y
 EOF
 # TODO 全ログ出力設定
 
-# phpMyAdmin
+echo "phpMyAdmin インストールと設定"
 yum --enablerepo=epel,remi,remi-php70 -y install phpMyAdmin
 # 設定ファイル編集# バーチャルホストで設定
 cat > /etc/nginx/conf.d/phpMyAdmin.conf <<'EOF'
@@ -194,3 +197,6 @@ chown root:nginx /etc/phpMyAdmin/config.inc.php
 chown -R nginx:nginx /var/lib/phpMyAdmin/*
 chown -R root:nginx /var/lib/php/session/
 systemctl restart nginx
+# ファイアーウォール設定
+firewall-cmd --permanent --zone=public --add-port=8080/tcp
+firewall-cmd --reload

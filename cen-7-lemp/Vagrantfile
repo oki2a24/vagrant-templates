@@ -7,9 +7,8 @@ Vagrant.configure("2") do |config|
   config.vm.box = "oki2a24/centos-7-x86_64"
   config.vm.network "private_network", ip: ipadress
   config.vm.provision "shell", path: "../scripts/cen-7-init.sh"
-#  config.vm.provision "shell" do |shell|
-#    shell.path = "wordpress.sh"
-#    shell.args = ipadress
-#  end
-
+  config.vm.provision "shell" do |shell|
+    shell.path = "../scripts/cen-7-lemp.sh"
+    shell.args = ipadress
+  end
 end
