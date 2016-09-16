@@ -23,3 +23,5 @@
 ## phpMyAdmin について
 - URL は http://192.168.56.11:8080 となります。
   IP アドレス部分は、Vagrantfile 等の設定により適宜読み替えてください。
+- ユーザ名: root
+  パスワード: vagrant

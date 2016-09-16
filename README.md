@@ -8,6 +8,10 @@ vagrant up
 ```
 
 ## Vagnrant テンプレート一覧
+- cen-6-mongo-express
+- cen-6-lamp
+- [cen-7-lemp](cen-7-lemp/README.md)
+
 ### cen-6-mongo-express
 - CentOS 6 x86_64
 - MongoDB 3.2
