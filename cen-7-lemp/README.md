@@ -8,10 +8,10 @@
 - phpMyAdmin 4
 
 ## ファイアーウォールについて
-− 有効になっています。
+- 有効になっています。
 
 ## Nginx について
-− ドキュメントルートは /var/www/html/ です。
+- ドキュメントルートは /var/www/html/ です。
 
 ## MariaDB について
 - 全クエリログを /var/log/mariadb/query.log に出力します。
