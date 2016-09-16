@@ -61,9 +61,75 @@ rpm -ivh http://rpms.famillecollet.com/enterprise/remi-release-7.rpm
 yum --enablerepo=remi -y update remi-release
 # 無効化。EPEL のみ。Remi は最初から無効
 sudo sed -i -e 's/^enabled=1/enabled=0/' /etc/yum.repos.d/epel.repo
-# php7 と図形、日本語、キャッシュをインストール
-yum --enablerepo=epel,remi,remi-php70 -y install php php-gd php-mbstring php-mysqlnd php-opcache
-# TODO PHP 設定
+# php7 と図形、日本語、キャッシュ、PHPUnit をインストール
+yum --enablerepo=epel,remi,remi-php70 -y install php php-gd php-mbstring php-mysqlnd php-opcache php-pecl-xdebug php-phpunit-PHPUnit
+# php.ini 設定
+cp -a /etc/php.ini /etc/php.ini.org
+# default_charset = "UTF-8" に設定済み
+#sed -i -e 's|;default_charset = "iso-8859-1"|default_charset = "UTF-8"|' /etc/php.ini
+# error_log は php-fpm で設定
+#sed -i -e 's|;error_log = php_errors.log|error_log = "/var/log/php_errors.log"|' /etc/php.ini
+#touch /var/log/php_errors.log
+#chown nginx:nginx /var/log/php_errors.log
+#cat > /etc/logrotate.d/php <<EOF
+#/var/log/php_errors.log {
+#    daily
+#    missingok
+#    rotate 52
+#    compress
+#    delaycompress
+#    notifempty
+#    create 640 nginx adm
+#    sharedscripts
+#    postrotate
+#            [ -f /var/run/nginx.pid ] && kill -USR1 `cat /var/run/nginx.pid`
+#    endscript
+#}
+#EOF
+sed -i -e 's|;mbstring.language = Japanese|mbstring.language = Japanese|' /etc/php.ini
+# PHP 5.6.0 で 非推奨
+#sed -i -e 's|;mbstring.internal_encoding = EUC-JP|mbstring.internal_encoding = UTF-8|' /etc/php.ini
+#sed -i -e 's|;mbstring.http_input = auto|mbstring.http_input = auto|' /etc/php.ini
+sed -i -e 's|;mbstring.detect_order = auto|mbstring.detect_order = auto|' /etc/php.ini
+sed -i -e 's|;date.timezone =|date.timezone = "Asia/Tokyo"|' /etc/php.ini
+# Xdebug 設定
+# Xdebug を使用可能に。リモートデバッグを許可。var_dump 内容をすべて表示
+cp -a /etc/php.d/15-xdebug.ini /etc/php.d/15-xdebug.ini.org
+cat >> /etc/php.d/15-xdebug.ini <<EOF
+
+xdebug.remote_enable = 1
+xdebug.remote_host = 10.0.2.2
+xdebug.remote_log = "/var/log/xdebug.log"
+xdebug.var_display_max_children = -1
+xdebug.var_display_max_data = -1
+xdebug.var_display_max_depth = -1
+EOF
+# Xdebug ログ出力準備
+touch /var/log/xdebug.log
+chown nginx:nginx /var/log/xdebug.log
+cat > /etc/logrotate.d/xdebug <<EOF
+/var/log/xdebug.log {
+    daily
+    missingok
+    rotate 52
+    compress
+    delaycompress
+    notifempty
+    create 640 nginx adm
+    sharedscripts
+    postrotate
+            [ -f /var/run/nginx.pid ] && kill -USR1 `cat /var/run/nginx.pid`
+    endscript
+}
+EOF
+# Xdebug　用に php.ini 設定
+# エラーをウェブブラウザに表示
+sed -i -e 's|display_errors = Off|display_errors = On|' /etc/php.ini
+# var_dump を装飾
+# 最初から On
+#sed -i -e 's|html_errors = Off|html_errors = On|' /etc/php.ini
+# 設定完了したので、設定反映
+systemctl restart nginx.service
 
 echo "PHP-FPM インストールと設定"
 # インストール
@@ -90,6 +156,7 @@ php_admin_flag[log_errors] = on
 php_value[session.save_handler] = files
 php_value[session.save_path]    = /var/lib/php/session
 php_value[soap.wsdl_cache_dir]  = /var/lib/php/wsdlcache
+catch_workers_output = yes
 EOF
 # 起動と自動起動設定
 systemctl start php-fpm.service
@@ -138,7 +205,38 @@ Y
 Y
 Y
 EOF
-# TODO 全ログ出力設定
+# 全クエリログ出力
+cp -a /etc/my.cnf /etc/my.cnf.org
+cat >> /etc/my.cnf <<EOF
+[mysqld]
+general-log
+general-log-file=/var/log/mariadb/query.log
+log-output=file
+EOF
+mkdir -p /var/log/mariadb/
+touch /var/log/mariadb/query.log
+chown -R mysql:mysql /var/log/mariadb/
+# ログローテート
+cat > /etc/logrotate.d/mariadb <<EOF
+/var/log/mariadb/*.log {
+    create 640 mysql mysql
+    notifempty
+    daily
+    rotate 3
+    missingok
+    compress
+    postrotate
+    # just if mysqld is really running
+    if test -x /usr/bin/mysqladmin && \
+        /usr/bin/mysqladmin ping &>/dev/null
+    then
+        /usr/bin/mysqladmin flush-logs
+    fi
+    endscript
+}
+EOF
+# 設定完了、再起動
+systemctl restart mariadb.service
 
 echo "phpMyAdmin インストールと設定"
 yum --enablerepo=epel,remi,remi-php70 -y install phpMyAdmin
@@ -196,7 +294,7 @@ EOF
 chown root:nginx /etc/phpMyAdmin/config.inc.php
 chown -R nginx:nginx /var/lib/phpMyAdmin/*
 chown -R root:nginx /var/lib/php/session/
-systemctl restart nginx
+systemctl restart nginx.service
 # ファイアーウォール設定
 firewall-cmd --permanent --zone=public --add-port=8080/tcp
 firewall-cmd --reload
