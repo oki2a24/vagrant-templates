@@ -21,3 +21,6 @@ vagrant up
 - PHP 5.3
   - Xdebug 2.2.7
 - phpMyAdmin 4
+
+### cen-7-lemp
+[リンク](cen-7-lemp/README.md)
