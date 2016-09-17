@@ -65,31 +65,7 @@ sudo sed -i -e 's/^enabled=1/enabled=0/' /etc/yum.repos.d/epel.repo
 yum --enablerepo=epel,remi,remi-php70 -y install php php-gd php-mbstring php-mysqlnd php-opcache php-pecl-xdebug php-phpunit-PHPUnit
 # php.ini 設定
 cp -a /etc/php.ini /etc/php.ini.org
-# default_charset = "UTF-8" に設定済み
-#sed -i -e 's|;default_charset = "iso-8859-1"|default_charset = "UTF-8"|' /etc/php.ini
-# error_log は php-fpm で設定
-#sed -i -e 's|;error_log = php_errors.log|error_log = "/var/log/php_errors.log"|' /etc/php.ini
-#touch /var/log/php_errors.log
-#chown nginx:nginx /var/log/php_errors.log
-#cat > /etc/logrotate.d/php <<EOF
-#/var/log/php_errors.log {
-#    daily
-#    missingok
-#    rotate 52
-#    compress
-#    delaycompress
-#    notifempty
-#    create 640 nginx adm
-#    sharedscripts
-#    postrotate
-#            [ -f /var/run/nginx.pid ] && kill -USR1 `cat /var/run/nginx.pid`
-#    endscript
-#}
-#EOF
 sed -i -e 's|;mbstring.language = Japanese|mbstring.language = Japanese|' /etc/php.ini
-# PHP 5.6.0 で 非推奨
-#sed -i -e 's|;mbstring.internal_encoding = EUC-JP|mbstring.internal_encoding = UTF-8|' /etc/php.ini
-#sed -i -e 's|;mbstring.http_input = auto|mbstring.http_input = auto|' /etc/php.ini
 sed -i -e 's|;mbstring.detect_order = auto|mbstring.detect_order = auto|' /etc/php.ini
 sed -i -e 's|;date.timezone =|date.timezone = "Asia/Tokyo"|' /etc/php.ini
 # Xdebug 設定
@@ -125,9 +101,6 @@ EOF
 # Xdebug　用に php.ini 設定
 # エラーをウェブブラウザに表示
 sed -i -e 's|display_errors = Off|display_errors = On|' /etc/php.ini
-# var_dump を装飾
-# 最初から On
-#sed -i -e 's|html_errors = Off|html_errors = On|' /etc/php.ini
 # 設定完了したので、設定反映
 systemctl restart nginx.service
 
@@ -261,36 +234,7 @@ server {
     }
 }
 EOF
-# エイリアスで設定
-# cat > /etc/nginx/conf.d/phpMyAdmin.conf <<'EOF'
-# server {
-#     location /phpMyAdmin {
-#         alias /usr/share/phpMyAdmin;
-#         index index.php;
-#     }
-#
-#     location ~ /phpMyAdmin/.*\.php$ {
-#         fastcgi_pass   unix:/var/run/php-fpm/php-fpm.sock;
-#         fastcgi_index  index.php;
-#         fastcgi_param  SCRIPT_FILENAME  /usr/share/$uri;
-#         include        fastcgi_params;
-#     }
-# }
-# EOF
-# 2016/07/04 22:08:41 [error] 8987#8987: *5 FastCGI sent in stderr: "PHP message: # PHP Fatal error:  Uncaught Error: Call to undefined function __() in # /usr/share/phpMyAdmin/libraries/core.lib.php:245
-# Stack trace:
-# #0 /usr/share/phpMyAdmin/libraries/session.inc.php(100): PMA_fatalError('Error # during se...')
-# #1 /usr/share/phpMyAdmin/libraries/common.inc.php(350): # require('/usr/share/phpM...')
-# #2 /usr/share/phpMyAdmin/index.php(12): require_once('/usr/share/phpM...')
-# #3 {main}
-#   thrown in /usr/share/phpMyAdmin/libraries/core.lib.php on line 245" while reading response header from upstream, client: 192.168.56.1, server: localhost, request: "GET / HTTP/1.1", upstream: "fastcgi://unix:/var/run/php-fpm/php-fpm.sock:", host: "192.168.56.11:8080"
-# 上記エラー
-# 原因は、ファイル・ディレクトリの所有者が apache となっているため。
-# nginx に変更する。
-# 参考
-# php - phpMyAdmin Fatal error: Call to undefined function __() - Stack Overflow http://stackoverflow.com/questions/27537617/phpmyadmin-fatal-error-call-to-undefined-function
-# php - nginx の alias指定で phpMyAdmin に接続する時の File Not Found エラーの解消法 - スタック・オーバーフロー http://ja.stackoverflow.com/questions/2828/nginx-%E3%81%AE-alias%E6%8C%87%E5%AE%9A%E3%81%A7-phpmyadmin-%E3%81%AB%E6%8E%A5%E7%B6%9A%E3%81%99%E3%82%8B%E6%99%82%E3%81%AE-file-not-found-%E3%82%A8%E3%83%A9%E3%83%BC%E3%81%AE%E8%A7%A3%E6%B6%88%E6%B3%95
-# Nginx - phpMyAdmin を使用する！ - mk-mode BLOG http://www.mk-mode.com/octopress/2013/01/21/nginx-phpmyadmin/
+# Nginx 対応設定
 chown root:nginx /etc/phpMyAdmin/config.inc.php
 chown -R nginx:nginx /var/lib/phpMyAdmin/*
 chown -R root:nginx /var/lib/php/session/
