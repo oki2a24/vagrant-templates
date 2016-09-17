@@ -1,4 +1,11 @@
 # cen-7-lemp
+## 使い方
+```bash
+git clone https://github.com/oki2a24/vagrant-templates.git
+cd vagrant-templates/cen-7-lemp
+vagrant up
+```
+## 構成
 - CentOS 7 x86_64
 - Nginx 1.10.1
 - MariaDB 10.1.17
