@@ -139,8 +139,6 @@ systemctl restart mariadb.service
 echo "phpMyAdmin インストールと設定"
 yum -y --enablerepo=epel install phpMyAdmin
 # エイリアスのみ設定し、認証系設定は削除
-# Apach 2.4 系では、Directory ディレクティブのアクセス設定が必須であった。注意！
-# CentOS7でphpMyAdminに403 forbiddenを出され続けた話 - サナギわさわさ.json http://kakakazuma.hatenablog.com/entry/2015/03/19/234754
 cat > /etc/httpd/conf.d/phpMyAdmin.conf <<EOF
 Alias /phpMyAdmin /usr/share/phpMyAdmin
 Alias /phpmyadmin /usr/share/phpMyAdmin
