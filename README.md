@@ -7,9 +7,10 @@ cd cen-6-mongo-express
 vagrant up
 ```
 
-## Vagnrant テンプレート一覧
+## Vagnrant テンプレート一覧と詳細説明へのリンク
 - cen-6-mongo-express
 - cen-6-lamp
+- [cen-7-lamp](cen-7-lamp/README.md)
 - [cen-7-lemp](cen-7-lemp/README.md)
 
 ### cen-6-mongo-express
