@@ -9,10 +9,6 @@
 #
 ###########################################################################
 
-# 引数の取り方、コメントの書き方は次のページを参考にした。
-# 引数を処理する | UNIX & Linux コマンド・シェルスクリプト リファレンス http://shellscript.sunone.me/parameter.html
-# シェルスクリプト Tips | UNIX & Linux コマンド・シェルスクリプト リファレンス http://shellscript.sunone.me/tips.html
-
 set -eux
 
 # DB、ユーザ、パスワードの作成・設定

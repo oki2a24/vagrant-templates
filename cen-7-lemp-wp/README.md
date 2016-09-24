@@ -14,3 +14,6 @@ vagrant up
 - 管理画面 URL: http://192.168.56.11/wp-admin  
   ユーザ名: wploginuser  
   パスワード: wploginpass
+- データベース名: wpdb  
+  ユーザ名: wpdbuser  
+  パスワード: wpdbpass
