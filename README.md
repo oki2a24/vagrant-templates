@@ -12,6 +12,7 @@ vagrant up
 - cen-6-lamp
 - [cen-7-lamp](cen-7-lamp/README.md)
 - [cen-7-lemp](cen-7-lemp/README.md)
+- [cen-7-lemp-wp](cen-7-lemp-wp/README.md)
 
 ### cen-6-mongo-express
 - CentOS 6 x86_64
