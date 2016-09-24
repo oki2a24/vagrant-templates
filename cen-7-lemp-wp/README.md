@@ -9,8 +9,8 @@ vagrant up
 - [cen-7-lemp](../cen-7-lemp/README.md) と同様
 
 ## WordPress について
-- URL は http://192.168.56.11 となります。
+- URL は http://192.168.56.11 となります。  
   IP アドレス部分は、Vagrantfile 等の設定により適宜読み替えてください。
-- 管理画面 URL: http://192.168.56.11/wp-admin
-  ユーザ名: wploginuser
+- 管理画面 URL: http://192.168.56.11/wp-admin  
+  ユーザ名: wploginuser  
   パスワード: wploginpass

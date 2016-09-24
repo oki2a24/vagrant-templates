@@ -70,6 +70,3 @@ echo "."
 echo "##################################################"
 echo "Mongo Express server listening at http://admin:pass@$1:8081"
 echo "##################################################"
-
-# ダンプファイルから MongoDB へインポートしたい場合のコマンド
-# mongorestore -db db_name /path/to/dump_data.bson

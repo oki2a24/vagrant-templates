@@ -17,7 +17,7 @@ vagrant up
 ## ファイアーウォールについて
 - 有効になっています。
 
-## Nginx について
+## Apache について
 - ドキュメントルートは /var/www/html/ です。
 
 ## MariaDB について
@@ -28,7 +28,7 @@ vagrant up
 - Xdebug を使用してリモートデバッグが可能です。
 
 ## phpMyAdmin について
-- URL は http://192.168.56.11/phpMyAdmin/ となります。
+- URL は http://192.168.56.11/phpMyAdmin/ となります。  
   IP アドレス部分は、Vagrantfile 等の設定により適宜読み替えてください。
 - ユーザ名: root  
   パスワード: vagrant
