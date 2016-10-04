@@ -10,5 +10,4 @@ Vagrant.configure("2") do |config|
   config.vm.provision "shell", path: "../scripts/cen-7-httpd.sh"
   config.vm.provision "shell", path: "../scripts/cen-7-php7.sh"
   config.vm.provision "shell", path: "../scripts/cen-7-mariadb10.sh"
-  config.vm.provision "shell", path: "../scripts/cen-7-phpmyadmin.sh"
 end

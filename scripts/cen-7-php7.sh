@@ -74,3 +74,20 @@ EOF
 sed -i -e 's|display_errors = Off|display_errors = On|' /etc/php.ini
 # 設定完了したので、設定反映
 systemctl restart httpd.service
+
+echo "phpMyAdmin インストールと設定"
+# インストール
+yum -y --enablerepo=epel,remi,remi-php70 install phpMyAdmin
+# エイリアスのみ設定し、認証系設定は削除
+cp -a /etc/httpd/conf.d/phpMyAdmin.conf /etc/httpd/conf.d/phpMyAdmin.conf.org
+cat > /etc/httpd/conf.d/phpMyAdmin.conf <<EOF
+Alias /phpMyAdmin /usr/share/phpMyAdmin
+Alias /phpmyadmin /usr/share/phpMyAdmin
+
+<Directory /usr/share/phpMyAdmin/>
+  AllowOverride all
+  Require all granted
+</Directory>
+EOF
+# 設定完了したので、設定反映
+systemctl restart httpd.service
