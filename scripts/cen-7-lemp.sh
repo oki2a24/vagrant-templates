@@ -190,7 +190,7 @@ mkdir -p /var/log/mariadb/
 touch /var/log/mariadb/query.log
 chown -R mysql:mysql /var/log/mariadb/
 # ログローテート
-cat > /etc/logrotate.d/mariadb <<EOF
+cat > /etc/logrotate.d/mariadb <<'EOF'
 /var/log/mariadb/*.log {
     create 640 mysql mysql
     notifempty
