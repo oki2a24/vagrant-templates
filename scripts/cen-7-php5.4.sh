@@ -1,29 +1,18 @@
 #!/bin/bash
 #
 # Usage:
-#   cen-7-lamp.sh
+#   cen-7-php5.4.sh
 #
 # Description:
-#   CentOS 7 で LAMP 環境を構築します。
-#   Apache、MariaDB、PHP のインストールのためにリポジトリの追加は行いません。
+#   CentOS 7 で PHP5.4 環境を構築します。
+#   Apache での使用を前提とします。
+#   リポジトリの追加は行いません。
 #   xdebug、 PHPUnit をインストールします。
 #   EPEL リポジトリを利用して、phpMyAdmin をインストールします。
 #
 ###########################################################################
 
 set -eux
-
-echo "Apach インストールと設定"
-yum -y install httpd-devel
-# .htaccess を全許可
-sed -i -e 's/AllowOverride none/AllowOverride All/' /etc/httpd/conf/httpd.conf
-sed -i -e 's/AllowOverride None/AllowOverride All/' /etc/httpd/conf/httpd.conf
-# 自動起動設定と起動
-systemctl enable httpd.service
-systemctl start httpd.service
-# ファイアーウォール有効化
-firewall-cmd --permanent --zone=public --add-service=http
-firewall-cmd --reload
 
 echo "PHP インストールと設定"
 yum -y install php php-devel php-mysql
@@ -82,59 +71,6 @@ systemctl restart httpd.service
 
 echo "PHPUnit インストール"
 yum -y --enablerepo=epel install php-phpunit-PHPUnit
-
-echo "MariaDB インストールと設定"
-yum -y install mariadb-server
-# 自動起動設定と起動
-systemctl enable mariadb.service
-systemctl start mariadb.service
-# 初期設定
-# Enter current password for root (enter for none): 
-# Set root password? [Y/n] Y
-# New password: vagrant
-# Re-enter new password: vagrant
-# Remove anonymous users? [Y/n] Y
-# Disallow root login remotely? [Y/n] Y
-# Remove test database and access to it? [Y/n] Y
-# Reload privilege tables now? [Y/n] Y
-mysql_secure_installation <<EOF
-
-Y
-vagrant
-vagrant
-Y
-Y
-Y
-Y
-EOF
-# 全クエリログ出力
-#cp -a /etc/my.cnf /etc/my.cnf.org
-cp -a /etc/my.cnf.d/server.cnf /etc/my.cnf.d/server.cnf.org
-sed -i -e 's|\[mysqld\]|\[mysqld\]\ngeneral-log\ngeneral-log-file=/var/log/mariadb/query.log|' /etc/my.cnf.d/server.cnf
-touch /var/log/mariadb/query.log
-chown -R mysql:mysql /var/log/mariadb/
-# ログローテート
-cp -a /etc/logrotate.d/mariadb /etc/logrotate.d/mariadb.org
-cat > /etc/logrotate.d/mariadb <<'EOF'
-var/log/mariadb/*.log {
-    create 640 mysql mysql
-    notifempty
-    daily
-    rotate 3
-    missingok
-    compress
-    postrotate
-        # just if mysqld is really running
-        if test -x /usr/bin/mysqladmin && \
-            /usr/bin/mysqladmin ping &>/dev/null
-        then
-            /usr/bin/mysqladmin flush-logs
-        fi
-    endscript
-}
-EOF
-# 設定完了、再起動
-systemctl restart mariadb.service
 
 echo "phpMyAdmin インストールと設定"
 yum -y --enablerepo=epel install phpMyAdmin
