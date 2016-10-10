@@ -5,5 +5,6 @@
 - [cen-7-ec-cube-3-mariadb](cen-7-ec-cube-3-mariadb/README.md)
 - [cen-7-lamp](cen-7-lamp/README.md)
 - [cen-7-lamp-latest](cen-7-lamp-latest/README.md)
+- [cen-7-lapp](cen-7-lapp/README.md)
 - [cen-7-lemp](cen-7-lemp/README.md)
 - [cen-7-lemp-wp](cen-7-lemp-wp/README.md)
