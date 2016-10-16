@@ -45,7 +45,7 @@ rm -f html/install.php
 - URL は http://192.168.56.11/phpMyAdmin/ となります。  
   IP アドレス部分は、Vagrantfile 等の設定により適宜読み替えてください。
 - ユーザ名: root  
-  パスワード: vagrant
+  パスワード: password
 
 ## 仮想マシンリセット (削除・再生性) 時の注意
 `vagrant destroy` で仮想マシンを削除できます。
