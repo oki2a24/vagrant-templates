@@ -6,7 +6,6 @@
 # Description:
 #   CentOS 7 の最新化を行います。
 #   既存パッケージの最新化
-#   Virtualbox Guest Additions の最新化
 #
 ###########################################################################
 
@@ -15,12 +14,6 @@ set -eux
 # CentOS 7 の最新化
 yum -y --enablerepo=epel update
 systemctl restart dkms
-
-# VirtualBox Guest Additions のインストール
-mount -o loop,ro ~/VBoxGuestAdditions.iso /mnt/
-/mnt/VBoxLinuxAdditions.run || :
-umount /mnt/
-rm -f ~/VBoxGuestAdditions.iso
 
 # cleanup
 rpm -q --whatprovides kernel | grep -Fv "$(uname -r)" | xargs yum -y autoremove
