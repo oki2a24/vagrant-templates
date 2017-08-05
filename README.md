@@ -8,3 +8,4 @@
 - [cen-7-lapp](cen-7-lapp/README.md)
 - [cen-7-lemp](cen-7-lemp/README.md)
 - [cen-7-lemp-wp](cen-7-lemp-wp/README.md)
+- [cen-7-upgrade-vagrant-box](cen-7-upgrade-vagrant-box/README.md)
