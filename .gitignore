@@ -1,3 +1,4 @@
 /.DS_Store
 .vagrant/
 synced_folder/
+*.box
